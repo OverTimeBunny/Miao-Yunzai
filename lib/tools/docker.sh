@@ -71,7 +71,8 @@ cd "$TMP"
 echo "FROM $DKURL"'/library/node:slim
 RUN sed -i "s|deb.debian.org|'"$APTURL"'|g" /etc/apt/sources.list.d/debian.sources\
  && apt update\
- && apt install -y ca-certificates\
+ && apt install -y ca-certificates locales\
+ && echo "zh_CN.UTF-8 UTF-8">/etc/locale.gen\
  && sed -i "s|http://'"$APTURL"'|https://'"$APTURL"'|g" /etc/apt/sources.list.d/debian.sources\
  && apt update\
  && apt full-upgrade -y\
@@ -86,7 +87,7 @@ HEALTHCHECK CMD curl -s http://localhost:2536/status||exit 1
 WORKDIR /root/Yunzai
 ENTRYPOINT []
 CMD ["sh","/start"]
-EXPOSE 2536'>Dockerfile
+EXPOSE 2536' > Dockerfile
 docker build -t trss:yunzai .||abort "Docker 容器构建失败"
 echo "
 $Y- 正在启动 Docker 容器$O
@@ -104,7 +105,7 @@ echo -n 'if [ -n "$1" ];then case "$1" in
 esac;else
   docker logs -n100 '$DKNAME'
   exec docker attach '$DKNAME'
-fi'>"$CMDPATH/$CMD"&&
+fi' > "$CMDPATH/$CMD"&&
 chmod 755 "$CMDPATH/$CMD"||abort "脚本执行命令 $CMDPATH/$CMD 设置失败，手动执行命令：docker attach $DKNAME"
 echo "
 $G- Docker 容器安装完成，启动命令：$C$CMD$O"
